@@ -1,25 +1,44 @@
 import mongoose from "mongoose";
-import Comment from "./comment.model.js";
+import bcrypt from "bcryptjs";
 
-const userSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: true,
-    },
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, "Name is required"],
+    trim: true,
+    minlength: [2, "Name must be at least 2 characters"],
   },
-  { timestamps: true }
-);
+  email: {
+    type: String,
+    required: [true, "Email is required"],
+    unique: true,
+    lowercase: true,
+    trim: true,
+    match: [/^\S+@\S+\.\S+$/, "Please provide a valid email"],
+  },
+  password: {
+    type: String,
+    required: [true, "Password is required"],
+    minlength: [6, "Password must be at least 6 characters"],
+    select: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
-// when user record is about to delete -> delete all the comments user have made
-// This is called cascade delete.
-userSchema.pre("findOneAndDelete", async function (next) {
-  const userId = this.getQuery()._id;
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
 
-  await Comment.deleteMany({ user: userId });
-
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 

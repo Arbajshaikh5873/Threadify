@@ -1,69 +1,168 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import User from "./models/User.js";
+import Post from "./models/Post.js";
+import Comment from "./models/Comment.js";
+
 dotenv.config();
-import User from "../model/user.model.js";
-import Post from "../model/post.model.js";
-import Comment from "../model/comment.model.js";
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
-async function seed() {
+const seedDatabase = async () => {
   try {
-    await mongoose.connect(MONGODB_URI);
-    console.log("MongoDB connected");
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("MongoDB connected...");
 
-    // Clean DB
-    await User.deleteMany();
-    await Post.deleteMany();
     await Comment.deleteMany();
-    console.log("Database cleared");
+    await Post.deleteMany();
+    await User.deleteMany();
+    console.log("Database cleared...");
 
-    // Create Users
-    const users = await User.insertMany([
-      { name: "Arbaj" },
-      { name: "Amit" },
-      { name: "Rahul" },
+    const users = await User.create([
+      {
+        name: "Kyle",
+        email: "kyle@example.com",
+        password: "password123",
+      },
+      {
+        name: "Sarah",
+        email: "sarah@example.com",
+        password: "password123",
+      },
+      {
+        name: "John",
+        email: "john@example.com",
+        password: "password123",
+      },
+    ]);
+    console.log("Users created...");
+
+    const posts = await Post.create([
+      {
+        title: "Introduction to React Hooks",
+        body: "React Hooks are a powerful feature that allow you to use state and other React features without writing a class. In this post, we will explore useState, useEffect, and custom hooks.",
+        user: users[0]._id,
+      },
+      {
+        title: "Understanding MongoDB Indexing",
+        body: "Indexes support the efficient execution of queries in MongoDB. Without indexes, MongoDB must perform a collection scan, i.e., scan every document in a collection. This post covers best practices for indexing.",
+        user: users[1]._id,
+      },
+      {
+        title: "Building RESTful APIs with Express",
+        body: "Express is a minimal and flexible Node.js web application framework. This guide will walk you through creating a production-ready REST API with proper routing, middleware, and error handling.",
+        user: users[0]._id,
+      },
+    ]);
+    console.log("Posts created...");
+
+    const comments = await Comment.create([
+      {
+        message:
+          "Great explanation! This really helped me understand hooks better.",
+        user: users[1]._id,
+        post: posts[0]._id,
+        parent: null,
+      },
+      {
+        message:
+          "Thanks! I am glad it was helpful. Which hook are you finding most useful?",
+        user: users[0]._id,
+        post: posts[0]._id,
+        parent: null,
+      },
+      {
+        message:
+          "Definitely useState and useEffect. They cover most of my use cases.",
+        user: users[1]._id,
+        post: posts[0]._id,
+        parent: null,
+      },
+      {
+        message: "Do you have any tips for optimizing MongoDB queries?",
+        user: users[2]._id,
+        post: posts[1]._id,
+        parent: null,
+      },
+      {
+        message:
+          "Yes! Always use compound indexes for queries with multiple fields.",
+        user: users[1]._id,
+        post: posts[1]._id,
+        parent: null,
+      },
+      {
+        message: "That makes sense. What about indexing arrays?",
+        user: users[2]._id,
+        post: posts[1]._id,
+        parent: null,
+      },
+      {
+        message: "Multikey indexes are your friend for array fields!",
+        user: users[1]._id,
+        post: posts[1]._id,
+        parent: null,
+      },
+      {
+        message: "This is exactly what I was looking for. Thank you!",
+        user: users[0]._id,
+        post: posts[2]._id,
+        parent: null,
+      },
+      {
+        message: "Could you cover authentication in a future post?",
+        user: users[2]._id,
+        post: posts[2]._id,
+        parent: null,
+      },
+      {
+        message: "Absolutely! JWT authentication will be my next topic.",
+        user: users[0]._id,
+        post: posts[2]._id,
+        parent: null,
+      },
     ]);
 
-    // Create Post
-    const post = await Post.create({
-      title: "Is MERN stack good for real-world apps?",
-      body: "Let's discuss how MERN performs in production systems.",
-    });
+    const nestedComments = await Comment.create([
+      {
+        message:
+          "I would add useContext to that list. It is incredibly useful for state management.",
+        user: users[2]._id,
+        post: posts[0]._id,
+        parent: comments[2]._id,
+      },
+      {
+        message: "Good point! useContext is great for avoiding prop drilling.",
+        user: users[0]._id,
+        post: posts[0]._id,
+        parent: comments[2]._id,
+      },
+      {
+        message: "Thank you for the tip! I will try that approach.",
+        user: users[2]._id,
+        post: posts[1]._id,
+        parent: comments[4]._id,
+      },
+      {
+        message:
+          "Also consider using the explain() method to analyze query performance.",
+        user: users[0]._id,
+        post: posts[1]._id,
+        parent: comments[4]._id,
+      },
+      {
+        message: "Looking forward to it! Will you also cover refresh tokens?",
+        user: users[1]._id,
+        post: posts[2]._id,
+        parent: comments[9]._id,
+      },
+    ]);
 
-    // Create Comments (nested)
-    const c1 = await Comment.create({
-      message: "Yes, MERN is great for startups",
-      user: users[0]._id,
-      post: post._id,
-    });
-
-    const c2 = await Comment.create({
-      message: "React makes UI development fast",
-      user: users[1]._id,
-      post: post._id,
-      parent: c1._id,
-    });
-
-    const c3 = await Comment.create({
-      message: "MongoDB scales very well",
-      user: users[2]._id,
-      post: post._id,
-      parent: c2._id,
-    });
-
-    const c4 = await Comment.create({
-      message: "Node.js handles concurrent users nicely",
-      user: users[1]._id,
-      post: post._id,
-    });
-
-    console.log("Seed data inserted successfully 🚀");
-    process.exit();
+    console.log("Comments created with nested replies...");
+    console.log("Database seeded successfully!");
+    process.exit(0);
   } catch (error) {
-    console.error("Seeding failed:", error);
+    console.error("Error seeding database:", error);
     process.exit(1);
   }
-}
+};
 
-seed();
+seedDatabase();

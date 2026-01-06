@@ -1,8 +1,15 @@
 import express from "express";
-import getPosts from "../controller/post.controller.js";
+import {
+  createPost,
+  getPosts,
+  getPost,
+} from "../controllers/postController.js";
+import { protect } from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.get("/post", getPosts);
+router.route("/").post(protect, createPost).get(getPosts);
+
+router.route("/:id").get(getPost);
 
 export default router;
