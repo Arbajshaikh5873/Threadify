@@ -3,9 +3,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import { errorHandler } from "./middlewares/error.js";
-import authRoutes from "./routes/authRoutes.js";
-import postRoutes from "./routes/postRoutes.js";
-import commentRoutes from "./routes/commentRoutes.js";
+import authRoutes from "./routes/auth.router.js";
+import postRoutes from "./routes/post.router.js";
+import commentRoutes from "./routes/comment.router.js";
 
 dotenv.config();
 

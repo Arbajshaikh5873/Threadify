@@ -3,7 +3,7 @@ import {
   createPost,
   getPosts,
   getPost,
-} from "../controllers/postController.js";
+} from "../controllers/post.controller.js";
 import { protect } from "../middlewares/auth.js";
 
 const router = express.Router();

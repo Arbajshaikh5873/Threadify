@@ -4,7 +4,7 @@ import {
   getComments,
   updateComment,
   deleteComment,
-} from "../controllers/commentController.js";
+} from "../controllers/comment.controller.js";
 import { protect } from "../middlewares/auth.js";
 
 const router = express.Router({ mergeParams: true });
