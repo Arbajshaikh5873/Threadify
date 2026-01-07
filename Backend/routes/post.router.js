@@ -5,14 +5,15 @@ import {
   getallPost,
   getPost,
 } from "../controllers/post.controller.js";
+import { protect } from "../Middleware/auth.js";
 
 // Create a new post
-router.post("/", createPost);
+router.post("/", protect, createPost);
 
 // Get all posts
-router.get("/", getallPost);
+router.get("/", protect, getallPost);
 
 // Get a single post by ID
-router.get("/:id", getPost);
+router.get("/:id", protect, getPost);
 
 export default router;

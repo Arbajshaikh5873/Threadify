@@ -5,28 +5,17 @@ import {
   getAllComments,
   getComment,
 } from "../controllers/comment.controller.js";
+import Comment from "../models/comment.model.js";
+import { protect } from "../Middleware/auth.js";
 
 // Create a new comment
-router.post("/", createComment);
+router.post("/", protect, createComment);
 
 // Get all comments for a post (flat structure)
 
-// router.get("/post/:postId",
-//   async (req, res) => {
-//   try {
-//     const comments = await Comment.find({ postId: req.params.postId }).sort({
-//       createdAt: 1,
-//     });
-
-//     return res.status(200).json(comments);
-//   } catch (error) {
-//     return res.status(500).json({ error: error.message });
-//   }
-// });
-
-router.get("/post/:postId", getAllComments);
+router.get("/post/:postId", protect, getAllComments);
 
 // Get a single comment
-router.get("/:id", getComment);
+router.get("/:id", protect, getComment);
 
 export default router;

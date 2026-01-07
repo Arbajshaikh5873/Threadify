@@ -1,4 +1,4 @@
-import Post from "../models/post.model";
+import Post from "../models/post.model.js";
 
 export const createPost = async (req, res) => {
   try {
@@ -8,7 +8,7 @@ export const createPost = async (req, res) => {
       return res.status(400).json({ error: "Title and content are required" });
     }
 
-    const post = new Post.create({
+    const post = new Post({
       title,
       content,
     });

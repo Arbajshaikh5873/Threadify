@@ -1,4 +1,4 @@
-import Comment from "../models/comment.model";
+import Comment from "../models/comment.model.js";
 
 export const createComment = async (req, res) => {
   try {
@@ -25,31 +25,10 @@ export const createComment = async (req, res) => {
 export const getAllComments = async (req, res) => {
   try {
     const comments = await Comment.find({ postId: req.params.postId }).sort({
-      createdAt: 1,
+      createdAt: -1,
     });
 
-    const commentMap = {};
-    const rootComments = [];
-
-    comments.forEach((comment) => {
-      commentMap[comment._id] = {
-        ...comment.toObject(),
-        replies: [],
-      };
-    });
-
-    comments.forEach((comment) => {
-      if (comment.parentId) {
-        const parentId = comment.parentId.toString();
-        if (commentMap[parentId]) {
-          commentMap[parentId].replies.push(commentMap[comment._id]);
-        }
-      } else {
-        rootComments.push(commentMap[comment._id]);
-      }
-    });
-
-    return res.status(200).json(rootComments);
+    return res.status(200).json(comments);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

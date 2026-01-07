@@ -15,9 +15,10 @@ function CreatePost({ onPostCreated }) {
     setIsSubmitting(true);
 
     try {
+      const dataPost = { title, content };
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/posts`,
-        { title, content }
+        dataPost
       );
 
       const newPost = response.data;
