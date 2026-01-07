@@ -1,5 +1,5 @@
-import { JsonWebTokenError } from "jsonwebtoken";
-import User from "../models/user.model";
+import User from "../models/user.model.js";
+import bcrypt from "bcryptjs";
 
 import jwt from "jsonwebtoken";
 
@@ -13,7 +13,7 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = await User.create({ name, email, pass });
+    const user = await User.create({ name, email, password: pass });
 
     if (user) {
       return res.status(200).json(user);
@@ -23,7 +23,7 @@ export const register = async (req, res) => {
   }
 };
 
-export const logIn = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, pass } = req.body;
 
@@ -33,7 +33,7 @@ export const logIn = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const isMatch = await bcrypt.compare(pass, User.password);
+    const isMatch = await bcrypt.compare(pass, userExists.password);
 
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });

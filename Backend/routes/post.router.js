@@ -4,6 +4,8 @@ import {
   createPost,
   getallPost,
   getPost,
+  updatePost,
+  deletePost,
 } from "../controllers/post.controller.js";
 import { protect } from "../Middleware/auth.js";
 
@@ -15,5 +17,11 @@ router.get("/", protect, getallPost);
 
 // Get a single post by ID
 router.get("/:id", protect, getPost);
+
+// Update a post
+router.put("/:id", protect, updatePost);
+
+// Delete a post
+router.delete("/:id", protect, deletePost);
 
 export default router;

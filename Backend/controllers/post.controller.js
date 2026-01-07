@@ -11,6 +11,7 @@ export const createPost = async (req, res) => {
     const post = new Post({
       title,
       content,
+      userId: req.userId,
     });
 
     await post.save();
@@ -38,6 +39,52 @@ export const getPost = async (req, res) => {
     }
 
     return res.json(post);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const updatePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    if (post.userId.toString() !== req.userId) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to update this post" });
+    }
+
+    const { title, content } = req.body;
+    post.title = title || post.title;
+    post.content = content || post.content;
+
+    await post.save();
+    return res.json(post);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const deletePost = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    if (post.userId.toString() !== req.userId) {
+      return res
+        .status(403)
+        .json({ error: "Not authorized to delete this post" });
+    }
+
+    await post.deleteOne();
+    return res.json({ message: "Post deleted successfully" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
