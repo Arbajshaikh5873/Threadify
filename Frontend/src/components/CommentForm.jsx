@@ -14,13 +14,14 @@ function CommentForm({ postId, parentId, onCommentAdded, onCancel }) {
     setIsSubmitting(true);
 
     try {
+      const newComment = {
+        postId,
+        text,
+        parentId,
+      };
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/comments`,
-        {
-          postId,
-          text,
-          parentId,
-        }
+        newComment
       );
 
       const newPost = await response.data;

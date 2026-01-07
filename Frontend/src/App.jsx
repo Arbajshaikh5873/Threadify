@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import PostView from "./components/PostView";
 import CreatePost from "./components/CreatePost";
 import "./App.css";
+import axios from "axios";
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -14,8 +15,12 @@ function App() {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch("/api/posts");
-      const data = await response.json();
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/posts`
+      );
+      const data = await response.data;
+      console.log("data inside fetchPosts", data);
+
       setPosts(data);
 
       // Auto-select first post if available
@@ -35,6 +40,7 @@ function App() {
 
   return (
     <div className="app">
+      {/* Navbar Started */}
       <header className="app-header">
         <h1>Discussion Thread System</h1>
         <button
@@ -45,7 +51,10 @@ function App() {
         </button>
       </header>
 
+      {/* Navbar End */}
+
       <div className="app-container">
+        {/* Sidebar started */}
         <aside className="sidebar">
           <h2>All Posts</h2>
           <div className="posts-list">
@@ -73,6 +82,9 @@ function App() {
           </div>
         </aside>
 
+        {/* Sidebar End */}
+
+        {/* Main Page */}
         <main className="main-content">
           {showCreatePost ? (
             <CreatePost onPostCreated={handlePostCreated} />
@@ -84,6 +96,8 @@ function App() {
             </div>
           )}
         </main>
+
+        {/* Main Page end */}
       </div>
     </div>
   );

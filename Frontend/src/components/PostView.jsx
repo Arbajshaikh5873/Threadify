@@ -15,12 +15,16 @@ function PostView({ post }) {
 
   const fetchComments = async () => {
     try {
-      const response = await axios.get(`/api/comments/post/${post._id}`);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/comments/post/${post._id}`
+      );
       const data = response.data;
+      console.log("Data in Fetch Comments ", data);
+
       setComments(data);
       buildCommentTree(data);
     } catch (error) {
-      console.log("Error fetching comments:", error);
+      console.error("Error fetching comments:", error);
     }
   };
 

@@ -30,13 +30,13 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "PostId and text are required" });
     }
 
-    const comment = new Comment.create({
+    const comment = new Comment({
       postId,
       text,
       parentId: parentId || null,
     });
 
-    // await comment.save();
+    await comment.save();
     return res.status(200).json(comment);
   } catch (error) {
     return res.status(500).json({ error: error.message });
