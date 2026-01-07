@@ -1,4 +1,3 @@
-
 import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
@@ -9,6 +8,7 @@ import postRoutes from "./routes/post.router.js";
 import commentRoutes from "./routes/comment.router.js";
 import authRoutes from "./routes/user.router.js";
 import connectDB from "./config/db.js";
+
 const app = express();
 
 // Middleware
@@ -17,6 +17,7 @@ app.use(express.json());
 
 // MongoDB Connection
 connectDB();
+
 // Use Routes
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);

@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import Post from "./post.model.js";
-import Comment from "./comment.model.js";
 
 const userSchema = new mongoose.Schema(
   {
@@ -22,25 +20,18 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-//  Hashing password using Bcrypt
-userSchema.pre("save", async function (next) {
+// Hash password before saving
+userSchema.pre("save", async function () {
+  // Only hash if password is modified
   if (!this.isModified("password")) {
-    next();
     return;
   }
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
+// CREATE MODEL AFTER HOOKS
 const User = mongoose.model("User", userSchema);
-
-// Cascade delete hook
-userSchema.pre("remove", async function (next) {
-  await Post.deleteMany({ userId: this._id });
-  await Comment.deleteMany({ userId: this._id });
-  next();
-});
 
 export default User;

@@ -7,13 +7,12 @@ import {
   getComment,
   updateComment,
 } from "../controllers/comment.controller.js";
-import Comment from "../models/comment.model.js";
 import { protect } from "../Middleware/auth.js";
 
 // Create a new comment
 router.post("/", protect, createComment);
 
-// Get all comments for a post (flat structure)
+// Get all comments for a post 
 
 router.get("/post/:postId", protect, getAllComments);
 
