@@ -1,7 +1,15 @@
 import React from "react";
 import Comment from "./Comment";
 
-function CommentList({ comments, postId, onReply, onCommentAdded, depth = 0 }) {
+function CommentList({
+  comments,
+  postId,
+  onReply,
+  onCommentAdded,
+  onCommentDeleted,
+  depth = 0,
+  allComments = [],
+}) {
   if (!comments || comments.length === 0) {
     return depth === 0 ? (
       <div className="text-center py-12 bg-gray-50 rounded-lg">
@@ -37,7 +45,9 @@ function CommentList({ comments, postId, onReply, onCommentAdded, depth = 0 }) {
           postId={postId}
           onReply={onReply}
           onCommentAdded={onCommentAdded}
+          onCommentDeleted={onCommentDeleted}
           depth={depth}
+          allComments={allComments}
         />
       ))}
     </div>

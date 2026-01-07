@@ -111,78 +111,6 @@ Good luck to everyone preparing for interviews! What other tips do you have?`,
   },
 ];
 
-const comments = [
-  // Comments for first post
-  {
-    text: "This is awesome! Really excited to be part of this community.",
-    parentId: null,
-  },
-  {
-    text: "Thanks for creating this platform. Can't wait to start discussions!",
-    parentId: null,
-  },
-  {
-    text: "Welcome! What topics are you most interested in?",
-    parentId: null, // This will be set as reply to first comment
-  },
-
-  // Comments for React post
-  {
-    text: "Great list! I would also add: Always lift state up only when necessary.",
-    parentId: null,
-  },
-  {
-    text: "Don't forget about code splitting and lazy loading for better performance!",
-    parentId: null,
-  },
-  {
-    text: "Absolutely! React.lazy() and Suspense are game changers.",
-    parentId: null, // Reply to previous comment
-  },
-  {
-    text: "What about using Context API vs Redux? When do you prefer each?",
-    parentId: null,
-  },
-
-  // Comments for remote work post
-  {
-    text: "The Pomodoro Technique has been a lifesaver for me!",
-    parentId: null,
-  },
-  {
-    text: "I agree! 25 minutes of focused work followed by a 5-minute break works wonders.",
-    parentId: null, // Reply to previous
-  },
-  {
-    text: "Setting boundaries is crucial. I have a strict 'work hours only' policy.",
-    parentId: null,
-  },
-
-  // Comments for learning resources post
-  {
-    text: "FreeCodeCamp is also an excellent free resource!",
-    parentId: null,
-  },
-  {
-    text: "Don't forget about official documentation. MDN for web and Node.js docs are great.",
-    parentId: null,
-  },
-
-  // Comments for interview tips post
-  {
-    text: "Mock interviews really helped me. Practice with friends or use platforms like Pramp.",
-    parentId: null,
-  },
-  {
-    text: "Great tip! Also, don't forget to prepare your own questions for the interviewer.",
-    parentId: null,
-  },
-  {
-    text: "Understanding the company culture is just as important as technical skills.",
-    parentId: null, // Reply
-  },
-];
-
 // Connect to MongoDB
 const connectDB = async () => {
   try {
@@ -236,72 +164,73 @@ const seedPosts = async (users) => {
   }
 };
 
-// Seed comments
+// Seed comments with proper userId
 const seedComments = async (users, posts) => {
   try {
-    const commentsData = [];
-    let commentIndex = 0;
+    console.log("Creating comments with user references...");
 
-    // Post 1: 3 comments (1 top-level, 1 reply)
-    commentsData.push({
-      ...comments[commentIndex++],
+    // Post 1: Welcome post - 3 comments (1 with reply)
+    const comment1 = await Comment.create({
+      text: "This is awesome! Really excited to be part of this community.",
       postId: posts[0]._id,
       userId: users[1]._id,
+      parentId: null,
     });
 
-    commentsData.push({
-      ...comments[commentIndex++],
+    const comment2 = await Comment.create({
+      text: "Thanks for creating this platform. Can't wait to start discussions!",
       postId: posts[0]._id,
       userId: users[2]._id,
+      parentId: null,
     });
 
-    // Save first batch to get IDs for replies
-    const firstBatch = await Comment.insertMany(commentsData);
-
-    // Add reply to first comment
-    commentsData.push({
+    // Reply to comment1
+    await Comment.create({
       text: "Welcome! What topics are you most interested in?",
       postId: posts[0]._id,
       userId: users[0]._id,
-      parentId: firstBatch[0]._id,
+      parentId: comment1._id,
     });
 
     // Post 2: React post - 4 comments with nested replies
-    commentsData.push({
-      ...comments[commentIndex++],
+    const reactComment1 = await Comment.create({
+      text: "Great list! I would also add: Always lift state up only when necessary.",
       postId: posts[1]._id,
       userId: users[2]._id,
+      parentId: null,
     });
 
-    commentsData.push({
-      ...comments[commentIndex++],
+    const reactComment2 = await Comment.create({
+      text: "Don't forget about code splitting and lazy loading for better performance!",
       postId: posts[1]._id,
       userId: users[3]._id,
+      parentId: null,
     });
 
-    const secondBatch = await Comment.insertMany(commentsData);
-
-    // Reply to the code splitting comment
+    // Reply to reactComment2
     await Comment.create({
       text: "Absolutely! React.lazy() and Suspense are game changers.",
       postId: posts[1]._id,
       userId: users[0]._id,
-      parentId: secondBatch[secondBatch.length - 1]._id,
+      parentId: reactComment2._id,
     });
 
     await Comment.create({
-      ...comments[commentIndex++],
+      text: "What about using Context API vs Redux? When do you prefer each?",
       postId: posts[1]._id,
       userId: users[1]._id,
+      parentId: null,
     });
 
     // Post 3: Remote work - 3 comments with reply
     const remoteComment1 = await Comment.create({
-      ...comments[commentIndex++],
+      text: "The Pomodoro Technique has been a lifesaver for me!",
       postId: posts[2]._id,
       userId: users[0]._id,
+      parentId: null,
     });
 
+    // Reply to remoteComment1
     await Comment.create({
       text: "I agree! 25 minutes of focused work followed by a 5-minute break works wonders.",
       postId: posts[2]._id,
@@ -310,37 +239,43 @@ const seedComments = async (users, posts) => {
     });
 
     await Comment.create({
-      ...comments[commentIndex++],
+      text: "Setting boundaries is crucial. I have a strict 'work hours only' policy.",
       postId: posts[2]._id,
       userId: users[3]._id,
+      parentId: null,
     });
 
     // Post 4: Learning resources - 2 comments
     await Comment.create({
-      ...comments[commentIndex++],
+      text: "FreeCodeCamp is also an excellent free resource!",
       postId: posts[3]._id,
       userId: users[2]._id,
+      parentId: null,
     });
 
     await Comment.create({
-      ...comments[commentIndex++],
+      text: "Don't forget about official documentation. MDN for web and Node.js docs are great.",
       postId: posts[3]._id,
       userId: users[1]._id,
+      parentId: null,
     });
 
     // Post 5: Interview tips - 3 comments with reply
     await Comment.create({
-      ...comments[commentIndex++],
+      text: "Mock interviews really helped me. Practice with friends or use platforms like Pramp.",
       postId: posts[4]._id,
       userId: users[3]._id,
+      parentId: null,
     });
 
     const interviewComment = await Comment.create({
-      ...comments[commentIndex++],
+      text: "Great tip! Also, don't forget to prepare your own questions for the interviewer.",
       postId: posts[4]._id,
       userId: users[0]._id,
+      parentId: null,
     });
 
+    // Reply to interviewComment
     await Comment.create({
       text: "Understanding the company culture is just as important as technical skills.",
       postId: posts[4]._id,
@@ -375,7 +310,7 @@ const seedDatabase = async () => {
     // Seed posts
     const createdPosts = await seedPosts(createdUsers);
 
-    // Seed comments
+    // Seed comments with userId
     await seedComments(createdUsers, createdPosts);
 
     console.log("\n✨ Database seeding completed successfully!");
@@ -386,7 +321,7 @@ const seedDatabase = async () => {
     console.log("\n🔐 All users have password: password123");
     console.log("\n👤 Demo users:");
     createdUsers.forEach((user) => {
-      console.log(`   - ${user.email}`);
+      console.log(`   - ${user.name} (${user.email})`);
     });
 
     process.exit(0);

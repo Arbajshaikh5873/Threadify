@@ -4,12 +4,17 @@ const commentSchema = new mongoose.Schema({
   postId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Post",
-    required: true,
+    required: [true, "Post ID is required"],
   },
   text: {
     type: String,
-    required: true,
+    required: [true, "Comment text is required"],
     trim: true,
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: [true, "User ID is required"],
   },
   parentId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -22,9 +27,10 @@ const commentSchema = new mongoose.Schema({
   },
 });
 
-// Index for efficient querying
-commentSchema.index({ postId: 1 });
+// Indexes for efficient querying
+commentSchema.index({ postId: 1, createdAt: -1 });
 commentSchema.index({ parentId: 1 });
+commentSchema.index({ userId: 1 });
 
 const Comment = mongoose.model("Comment", commentSchema);
 
