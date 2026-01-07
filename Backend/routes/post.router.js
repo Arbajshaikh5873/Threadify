@@ -1,15 +1,51 @@
 import express from "express";
-import {
-  createPost,
-  getPosts,
-  getPost,
-} from "../controllers/post.controller.js";
-import { protect } from "../middlewares/auth.js";
-
 const router = express.Router();
+import Post from "../models/post.model.js";
 
-router.route("/").post(protect, createPost).get(getPosts);
+// Create a new post
+router.post("/", async (req, res) => {
+  try {
+    const { title, content } = req.body;
 
-router.route("/:id").get(getPost);
+    if (!title || !content) {
+      return res.status(400).json({ error: "Title and content are required" });
+    }
+
+    const post = new Post.create({
+      title,
+      content,
+    });
+
+    await post.save();
+    return res.status(200).json(post);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all posts
+router.get("/", async (req, res) => {
+  try {
+    const posts = await Post.find().sort({ createdAt: -1 });
+    return res.json(posts);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Get a single post by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    return res.json(post);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
 
 export default router;

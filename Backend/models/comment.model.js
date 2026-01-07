@@ -1,23 +1,17 @@
 import mongoose from "mongoose";
 
 const commentSchema = new mongoose.Schema({
-  message: {
-    type: String,
-    required: [true, "Message is required"],
-    trim: true,
-    minlength: [1, "Message cannot be empty"],
-  },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  post: {
+  postId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Post",
     required: true,
   },
-  parent: {
+  text: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  parentId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Comment",
     default: null,
@@ -28,9 +22,9 @@ const commentSchema = new mongoose.Schema({
   },
 });
 
-commentSchema.index({ post: 1, createdAt: -1 });
-commentSchema.index({ parent: 1 });
-commentSchema.index({ user: 1 });
+// Index for efficient querying
+commentSchema.index({ postId: 1 });
+commentSchema.index({ parentId: 1 });
 
 const Comment = mongoose.model("Comment", commentSchema);
 

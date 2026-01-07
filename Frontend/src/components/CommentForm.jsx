@@ -1,44 +1,68 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import "./CommentForm.css";
+import axios from "axios";
 
-function CommentForm({
-  onSubmit,
-  onCancel,
-  initialValue = "",
-  autoFocus = false,
-}) {
-  const [message, setMessage] = useState(initialValue);
+function CommentForm({ postId, parentId, onCommentAdded, onCancel }) {
+  const [text, setText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (message.trim()) {
-      await onSubmit(message);
-      setMessage("");
+
+    if (!text.trim()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/comments`,
+        {
+          postId,
+          text,
+          parentId,
+        }
+      );
+
+      const newPost = await response.data;
+      if (newPost) {
+        setText("");
+        onCommentAdded();
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
+    <form className="comment-form" onSubmit={handleSubmit}>
       <textarea
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        autoFocus={autoFocus}
+        className="comment-textarea"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder={parentId ? "Write your reply..." : "Add a comment..."}
         rows="3"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        placeholder="Write your comment..."
-        required
+        disabled={isSubmitting}
       />
-      <div className="flex gap-2">
+      <div className="comment-form-actions">
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-sm"
+          className="submit-button"
+          disabled={!text.trim() || isSubmitting}
         >
-          Post
+          {isSubmitting
+            ? "Posting..."
+            : parentId
+            ? "Post Reply"
+            : "Post Comment"}
         </button>
-        {onCancel && (
+        {parentId && onCancel && (
           <button
             type="button"
+            className="cancel-button"
             onClick={onCancel}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition text-sm"
+            disabled={isSubmitting}
           >
             Cancel
           </button>
